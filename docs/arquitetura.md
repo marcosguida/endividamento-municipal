@@ -1,26 +1,27 @@
 # Arquitetura e modelagem
 
-Diagramas em [Mermaid](https://mermaid.js.org/), renderizados pelo próprio GitHub. Notação: C4 (contexto
-e contêineres), UML (classes e sequência) e modelo entidade-relacionamento (dados).
+Diagramas em [Mermaid](https://mermaid.js.org/), renderizados pelo próprio GitHub. Notação: C4 (contexto),
+UML (classes e sequência) e modelo entidade-relacionamento (dados).
 
-## 1. Contexto e contêineres (C4)
+## 1. Contexto (C4)
 
-Quem usa o sistema, de onde vêm os dados e quais são as partes.
+De onde vêm os dados, o que o projeto produz e quem consome.
 
 ```mermaid
 flowchart LR
-    usuario(["Usuário / cliente HTTP<br/>(front-end, notebook, curl)"])
+    analista(["Pesquisador / analista"])
 
     subgraph fontes["Fontes públicas (Tesouro Nacional)"]
         tt[("Tesouro Transparente<br/>fpm-por-municipio.csv")]
         siconfi[("API SICONFI<br/>RGF Anexo 2 · DCA Anexo I-C")]
     end
 
-    subgraph sistema["endividamento-municipal"]
+    subgraph projeto["Radar Fiscal Municipal"]
         etl["ETL<br/>python -m endividamento.etl"]
         raw[("data/raw/<br/>brutos + cache JSON<br/>(fora do git)")]
         base[("data/processed/<br/>base_municipal_ANO.csv")]
-        api["API FastAPI<br/>uvicorn endividamento.api:app"]
+        rel["Relatório<br/>python -m endividamento.relatorio"]
+        out[("relatorios/<br/>tabelas CSV · Excel · gráficos PNG")]
         nb["Notebooks<br/>01 exploração · 02 análise"]
     end
 
@@ -31,11 +32,12 @@ flowchart LR
     raw --> etl
     etl -- "cache por município" --> raw
     etl -- "Load" --> base
-    base --> api
+    base --> rel --> out
     raw --> nb
     env -.-> etl
-    env -.-> api
-    usuario -- "GET /municipios, /indicadores ..." --> api
+    env -.-> rel
+    out --> analista
+    nb --> analista
 ```
 
 ## 2. Camadas e dependências entre módulos
@@ -44,18 +46,15 @@ Cada seta é um `import`. O domínio não depende de nenhuma outra camada.
 
 ```mermaid
 flowchart TB
-    api["api.py<br/>camada HTTP"]
-    schemas["schemas.py<br/>DTOs e validação"]
+    relatorio["relatorio.py<br/>tabelas e gráficos"]
     repo["repository.py<br/>acesso a dados"]
     etl["etl.py<br/>pipeline de dados"]
     dominio["dominio.py<br/>regras de negócio puras"]
     config["config.py<br/>Settings (.env)"]
 
-    api --> schemas
-    api --> repo
-    api --> dominio
-    api --> config
-    schemas --> dominio
+    relatorio --> repo
+    relatorio --> dominio
+    relatorio --> config
     repo --> dominio
     etl --> dominio
     etl --> config
@@ -73,9 +72,9 @@ classDiagram
     class Settings {
         +int ano
         +Path data_dir
+        +Path saida_dir
         +str siconfi_api_url
         +int siconfi_workers
-        +List~str~ cors_origins
         +raw_dir() Path
         +arquivo_base() Path
     }
@@ -102,8 +101,6 @@ classDiagram
         -DataFrame _df
         +from_csv(arquivo)$ MunicipioRepository
         +filtrar(uf, regiao, porte, quintil, nome, **intervalos) DataFrame
-        +obter(cod_ibge) DataFrame
-        +para_registros(df)$ List~dict~
     }
 
     class Indicador {
@@ -118,43 +115,11 @@ classDiagram
         correlacao
     }
 
-    class Filtros {
-        +List~UF~ uf
-        +List~Regiao~ regiao
-        +List~Porte~ porte
-        +List~Quintil~ quintil
-        +str nome
-        +float dep_fpm_min / max
-        +float pct_dcl_rcl_min / max
-        +int populacao_min / max
-        +criterios() dict
-    }
-    class ConsultaMunicipios {
-        +Ordenacao ordenar
-        +bool desc
-        +int limit
-        +int offset
-    }
-    class ConsultaIndicadores {
-        +List~NomeIndicador~ indicador
-    }
-    class Municipio {
-        <<DTO>>
-        +int cod_ibge
-        +int cod_siafi
-        +str municipio
-        +float pct_dcl_rcl
-        +float dep_fpm
-        +Dict~int,float~ fpm
-    }
-    class Resumo {
-        <<DTO>>
-        +int municipios
-        +int populacao
-        +Dependencia dependencia
-        +Divida divida
-        +Credito credito
-        +Correlacao correlacao
+    class relatorio {
+        <<module>>
+        +tabelas(base) Dict~str,DataFrame~
+        +graficos(base, tabelas, pasta)
+        +gerar(cfg) Dict~str,DataFrame~
     }
 
     Extrator <|.. extrair_rgf
@@ -164,43 +129,35 @@ classDiagram
     Settings <.. SiconfiClient : base_url
 
     INDICADORES o-- "4" Indicador : estratégias
-    Filtros <|-- ConsultaMunicipios
-    Filtros <|-- ConsultaIndicadores
-    MunicipioRepository ..> Filtros : criterios()
-    MunicipioRepository ..> Municipio : registros
-    INDICADORES ..> Resumo : resumo()
+    relatorio ..> MunicipioRepository : filtrar()
+    relatorio ..> INDICADORES : resumo() / resumo_por()
+    relatorio ..> Settings : saida_dir
 ```
 
-## 4. Sequência: `GET /indicadores/regiao?uf=TO&indicador=divida`
+## 4. Sequência: geração do relatório
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor C as Cliente
-    participant F as FastAPI
-    participant S as ConsultaIndicadores
-    participant DI as get_repo (lru_cache)
+    actor A as Analista
+    participant G as relatorio.gerar
     participant R as MunicipioRepository
-    participant D as dominio.resumo_por
+    participant D as dominio
+    participant FS as relatorios/
 
-    C->>F: GET /indicadores/regiao?uf=TO&indicador=divida
-    F->>S: valida query (UF, indicador)
-    alt parâmetro inválido
-        S-->>C: 422 Unprocessable Entity
+    A->>G: python -m endividamento.relatorio
+    G->>R: from_csv(base_municipal_2025.csv)
+    R-->>G: base (5.490 municípios)
+    G->>D: resumo_por(base, "regiao" | "quintil_dep" | "porte")
+    loop cada grupo
+        D->>D: INDICADORES[nome](grupo)
     end
-    F->>DI: Depends(get_repo)
-    alt primeira requisição do processo
-        DI->>R: from_csv(base_municipal_2025.csv)
-    end
-    DI-->>F: repositório (singleton)
-    F->>R: filtrar(**q.criterios())
-    R-->>F: DataFrame (133 municípios)
-    F->>D: resumo_por(df, "regiao", ["divida"])
-    loop cada região
-        D->>D: INDICADORES["divida"](grupo)
-    end
-    D-->>F: dict (NaN → None)
-    F-->>C: 200 JSON {"Norte": {...}}
+    D-->>G: DataFrames de indicadores
+    G->>D: serie_fpm(base)
+    D-->>G: FPM por ano
+    G->>FS: tabelas/*.csv + relatorio_endividamento_2025.xlsx
+    G->>FS: figuras/*.png
+    G-->>A: Relatório gerado
 ```
 
 ## 5. Pipeline ETL
