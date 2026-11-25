@@ -1,0 +1,6 @@
+,municipios,populacao,fpm_ultimo_ano,dependencia.mediana_pct,dependencia.municipios_alta_dependencia_pct,divida.dcl_rcl_mediana_pct,divida.dc_rcl_mediana_pct,divida.municipios_dcl_positiva_pct,divida.municipios_acima_alerta_pct,divida.municipios_acima_limite_pct,credito.municipios_com_operacao_pct,credito.operacoes_sobre_receita_pct,correlacao.dependencia_x_dc_rcl,correlacao.dependencia_x_dcl_rcl
+Q1 (menor),1097.0,140085745.0,81368403765.51,15.86,0.0,-3.2,11.39,44.06,0.27,0.27,35.73,1.36,-0.13,-0.04
+Q2,1097.0,27843061.0,38296070256.38,23.81,0.0,-2.41,8.95,45.87,0.46,0.37,22.88,0.43,-0.01,0.03
+Q3,1097.0,18997953.0,32594510630.48,29.4,0.0,-0.5,10.05,49.13,1.56,1.01,17.87,0.38,0.08,0.04
+Q4,1097.0,10634208.0,23959152001.61,35.81,0.0,-3.5,8.98,44.34,1.19,0.91,13.13,0.21,-0.02,-0.08
+Q5 (maior),1097.0,5143997.0,18985829830.82,45.42,97.9,-11.41,5.52,29.11,0.36,0.27,11.21,0.17,-0.19,-0.12

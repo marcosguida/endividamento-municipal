@@ -1,0 +1,7 @@
+,municipios,populacao,fpm_ultimo_ano,dependencia.mediana_pct,dependencia.municipios_alta_dependencia_pct,divida.dcl_rcl_mediana_pct,divida.dc_rcl_mediana_pct,divida.municipios_dcl_positiva_pct,divida.municipios_acima_alerta_pct,divida.municipios_acima_limite_pct,credito.municipios_com_operacao_pct,credito.operacoes_sobre_receita_pct,correlacao.dependencia_x_dc_rcl,correlacao.dependencia_x_dcl_rcl
+Sudeste,1660.0,86592090.0,61101402705.61,31.48,28.59,-11.34,5.12,28.49,0.06,0.06,22.35,0.98,-0.3,-0.25
+Nordeste,1771.0,55030307.0,69533755169.76,31.01,17.18,12.5,16.78,74.18,2.05,1.42,8.92,1.06,0.1,0.03
+Sul,1175.0,30528137.0,34120729998.43,28.95,17.12,-14.16,8.13,18.31,0.0,0.0,40.09,1.49,-0.36,-0.28
+Centro-Oeste,463.0,13537235.0,13641946372.28,23.24,11.45,-8.1,6.99,30.74,0.22,0.22,17.28,0.61,-0.01,0.06
+Norte,421.0,17087290.0,16927098511.51,23.07,10.0,-1.33,7.99,46.06,0.95,0.95,6.41,1.05,-0.09,-0.1
+Brasil,5490.0,202775059.0,195324932757.59,29.4,19.58,-4.19,8.78,42.52,0.77,0.57,20.16,1.06,-0.12,-0.1
