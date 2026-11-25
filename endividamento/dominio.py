@@ -1,7 +1,7 @@
 """Regras de negócio puras (sem I/O): constantes legais, classificações e indicadores.
 
 Cada indicador é uma *estratégia* (função `DataFrame -> dict`) registrada em
-`INDICADORES`. Qualquer seleção de municípios (Brasil, região, filtro do usuário)
+`INDICADORES`. Qualquer recorte de municípios (Brasil, região, quintil, filtro)
 passa pelas mesmas funções; para criar um indicador novo, basta registrá-lo.
 """
 import math
@@ -75,30 +75,27 @@ INDICADORES: Dict[str, Indicador] = {
 }
 
 
-def _sem_nan(d):
-    if isinstance(d, dict):
-        return {k: _sem_nan(v) for k, v in d.items()}
-    return None if isinstance(d, float) and math.isnan(d) else d
+def resumo(df: pd.DataFrame, nomes: Optional[Iterable[str]] = None) -> pd.Series:
+    """Totais do grupo + indicadores pedidos (todos, se `nomes` for None).
 
-
-def resumo(df: pd.DataFrame, nomes: Optional[Iterable[str]] = None) -> dict:
-    """Totais do grupo + os indicadores pedidos (todos, se `nomes` for None)."""
+    Índice no formato `indicador.metrica`, ex.: `divida.dcl_rcl_mediana_pct`.
+    """
     fpm = colunas_fpm(df)
     saida = {'municipios': len(df),
-             'populacao': int(df['populacao'].sum()),
-             'fpm_ultimo_ano': float(df[fpm[-1]].sum()) if fpm else None}
+             'populacao': df['populacao'].sum(),
+             'fpm_ultimo_ano': df[fpm[-1]].sum() if fpm else math.nan}
     for nome in (nomes or INDICADORES):
-        saida[nome] = INDICADORES[nome](df)
-    return _sem_nan(saida)
+        saida.update({f'{nome}.{k}': v for k, v in INDICADORES[nome](df).items()})
+    return pd.Series(saida, dtype=float)
 
 
-def resumo_por(df: pd.DataFrame, dimensao: str, nomes: Optional[Iterable[str]] = None) -> dict:
-    return {str(grupo): resumo(g, nomes) for grupo, g in df.groupby(dimensao, observed=True)}
+def resumo_por(df: pd.DataFrame, dimensao: str, nomes: Optional[Iterable[str]] = None) -> pd.DataFrame:
+    """Uma linha por grupo da dimensão (regiao, uf, porte, quintil_dep...)."""
+    return pd.DataFrame({grupo: resumo(g, nomes) for grupo, g in df.groupby(dimensao, observed=True)}).T
 
 
-def serie_fpm(df: pd.DataFrame) -> list:
-    """FPM total por ano (R$ nominais) e variação anual."""
+def serie_fpm(df: pd.DataFrame) -> pd.DataFrame:
+    """FPM total por ano (R$ nominais) e variação anual (%)."""
     total = df[colunas_fpm(df)].sum()
-    variacao = total.pct_change() * 100
-    return [{'ano': int(c[4:]), 'fpm': float(v), 'variacao_pct': _sem_nan(float(variacao[c]))}
-            for c, v in total.items()]
+    total.index = [int(c[4:]) for c in total.index]
+    return pd.DataFrame({'fpm': total, 'variacao_pct': total.pct_change() * 100}).rename_axis('ano')
