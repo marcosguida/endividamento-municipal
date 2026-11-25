@@ -140,6 +140,40 @@ Para criar um indicador novo, basta escrever a função e registrá-la.
 
 ## Stack e ferramentas
 
+**Linguagem**
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+
+**Análise e visualização de dados**
+
+![pandas](https://img.shields.io/badge/pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=for-the-badge&logo=python&logoColor=white)
+![Excel](https://img.shields.io/badge/openpyxl%20%28Excel%29-217346?style=for-the-badge)
+
+**Ambiente de análise**
+
+![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=for-the-badge&logo=jupyter&logoColor=white)
+![Google Colab](https://img.shields.io/badge/Google%20Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)
+
+**Configuração, testes e empacotamento**
+
+![Pydantic](https://img.shields.io/badge/pydantic--settings-E92063?style=for-the-badge&logo=pydantic&logoColor=white)
+![pytest](https://img.shields.io/badge/pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
+![setuptools](https://img.shields.io/badge/pyproject.toml-3776AB?style=for-the-badge&logo=python&logoColor=white)
+
+**Documentação e versionamento**
+
+![Mermaid](https://img.shields.io/badge/Mermaid-FF3670?style=for-the-badge&logo=mermaid&logoColor=white)
+![Markdown](https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
+
+**Fontes de dados**
+
+![SICONFI](https://img.shields.io/badge/API%20SICONFI-1F6FEB?style=for-the-badge)
+![Tesouro Transparente](https://img.shields.io/badge/Tesouro%20Transparente-0B6E4F?style=for-the-badge)
+
 | Área | Tecnologia | Uso |
 |---|---|---|
 | Linguagem | **Python 3.9+** | Todo o projeto |
