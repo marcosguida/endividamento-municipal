@@ -519,7 +519,7 @@ Os testes (`tests/test_analise.py`) recalculam a análise e comparam o resultado
 ## Autor
 
 **Marcos Ribeiro Guida**
-Estudante de CST em Sistemas para Internet, IFTO, Campus Palmas
+Discente de CST em Sistemas para Internet, IFTO, Campus Palmas
 
 [![GitHub](https://img.shields.io/badge/GitHub-marcosguida-181717?logo=github)](https://github.com/marcosguida)
 
