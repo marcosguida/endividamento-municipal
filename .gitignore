@@ -1,0 +1,23 @@
+# Segredos e configuração local
+.env
+.env.*
+!.env.example
+
+# Dados brutos (grandes e baixáveis de novo pelo ETL) e saídas dos notebooks
+data/raw/
+resultados/
+
+# Material pessoal/sigiloso que não vai para o GitHub (contratos, trabalhos entregues)
+_local/
+*.zip
+*.docx
+
+# Python / Jupyter / SO
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
