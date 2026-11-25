@@ -3,24 +3,26 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "endividamento-municipal"
+name = "radar-fiscal-municipal"
 version = "1.0.0"
-description = "API e pipeline de análise do endividamento municipal e da dependência do FPM"
+description = "Radar Fiscal Municipal: análise de dados do endividamento municipal e da dependência do FPM"
 readme = "README.md"
+authors = [{ name = "Marcos Ribeiro Guida" }]
 requires-python = ">=3.9"
 dependencies = [
-    "fastapi>=0.115",
-    "uvicorn>=0.30",
     "pandas>=2.0",
+    "matplotlib>=3.7",
+    "openpyxl>=3.1",
     "pydantic-settings>=2.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "httpx>=0.27"]
-notebooks = ["jupyter", "openpyxl", "numpy"]
+dev = ["pytest>=8"]
+notebooks = ["jupyter"]
 
 [tool.setuptools]
 packages = ["endividamento"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning:matplotlib.*"]
