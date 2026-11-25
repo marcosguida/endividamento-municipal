@@ -1,14 +1,14 @@
 """Repository: único ponto que sabe onde e como a base municipal está guardada.
 
-A API e as análises pedem municípios ao repositório e nunca leem arquivos
-diretamente; trocar o CSV por um banco de dados muda só esta classe.
+Relatórios, testes e notebooks pedem municípios ao repositório e nunca leem
+arquivos diretamente; trocar o CSV por um banco de dados muda só esta classe.
 """
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import Iterable, Optional
 
 import pandas as pd
 
-from .dominio import PORTES, QUINTIS, REGIOES, colunas_fpm, normalizar
+from .dominio import PORTES, QUINTIS, REGIOES, normalizar
 
 
 class MunicipioRepository:
@@ -44,17 +44,4 @@ class MunicipioRepository:
                 continue
             col, lado = chave.rsplit('_', 1)
             m &= df[col] >= valor if lado == 'min' else df[col] <= valor
-        return df[m]
-
-    def obter(self, cod_ibge: int) -> Optional[pd.DataFrame]:
-        return self._df.loc[[cod_ibge]] if cod_ibge in self._df.index else None
-
-    @staticmethod
-    def para_registros(df: pd.DataFrame) -> List[dict]:
-        """DataFrame -> lista de dicts JSON-friendly (NaN -> None, série do FPM agrupada)."""
-        fpm = colunas_fpm(df)
-        dados = df.drop(columns=['_nome', *fpm])
-        registros = dados.astype(object).where(dados.notna(), None).to_dict(orient='records')
-        for reg, serie in zip(registros, df[fpm].to_dict(orient='records')):
-            reg['fpm'] = {int(c[4:]): v for c, v in serie.items()}
-        return registros
+        return df[m].drop(columns='_nome')
