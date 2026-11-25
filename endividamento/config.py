@@ -1,7 +1,6 @@
 """Configuração lida de variáveis de ambiente / arquivo `.env` (nunca versionado)."""
 from functools import lru_cache
 from pathlib import Path
-from typing import List
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -15,7 +14,7 @@ class Settings(BaseSettings):
     data_dir: Path = RAIZ / 'data'
     siconfi_api_url: str = 'https://apidatalake.tesouro.gov.br/ords/siconfi/tt/'
     siconfi_workers: int = 4
-    cors_origins: List[str] = ['*']
+    saida_dir: Path = RAIZ / 'relatorios'
 
     @property
     def raw_dir(self) -> Path:
